@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_08/Presentation/splash_screen.dart';
+import 'package:flutter_08/Presentation/summary_screen.dart';
 import 'package:flutter_08/Presentation/task_model.dart';
 
 class ScreenHome extends StatefulWidget {
@@ -118,7 +119,12 @@ class _ScreenHomeState extends State<ScreenHome> {
                 child: ListView.separated(
                   itemBuilder: (context, index) {
                     return ListTile(
-                      onTap: () {},
+                      onTap: () {
+                        setState(() {
+                          myTask[index].taskStatus =
+                              myTask[index].taskStatus == "0" ? "1" : "0";
+                        });
+                      },
                       leading: Text(
                         (index + 1).toString(),
                         style: TextStyle(fontSize: 17),
@@ -138,6 +144,18 @@ class _ScreenHomeState extends State<ScreenHome> {
                             ),
                           ),
                           Spacer(),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      Statusdetails(task: myTask[index]),
+                                ),
+                              );
+                            },
+                            child: Text("View"),
+                          ),
                           IconButton(
                             onPressed: () {
                               setState(() {

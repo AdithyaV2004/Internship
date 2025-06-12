@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_08/Presentation/home_screen.dart';
+// import 'package:flutter_08/Presentation/home_screen.dart';
+import 'package:flutter_08/Presentation/splash_screen.dart';
 // import 'package:flutter_08/Presentation/splash_screen.dart';
 
 void main() {
@@ -11,6 +12,6 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: ScreenHome());
+    return MaterialApp(home: ScreenSplash());
   }
 }
