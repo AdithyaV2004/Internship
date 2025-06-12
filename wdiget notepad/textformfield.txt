@@ -1,0 +1,263 @@
+TextFormField(
+                decoration: InputDecoration(
+                  hintText: "User name",
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+                ),
+              )
+
+home: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.pinkAccent,
+            title: Text(
+              "My First App",
+              style: TextStyle(color: Colors.black, fontSize: 30, fontWeight: FontWeight.bold),
+            ),
+          ),
+          body: Row(children: [SizedBox(width: 100), Text("Hello"), Text("World"), Text("Adithya")]),
+        ),
+      )
+
+child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ClipOval(
+                child: Image(
+                  image: AssetImage("assets/profile.jpeg"),
+                  fit: BoxFit.cover,
+                  height: 200,
+                  width: 200,
+                ),
+              ),
+              CircleAvatar(
+                radius: 70,
+                backgroundImage: NetworkImage(
+                  "https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=600",
+                ),
+              ),
+            ],
+          ),
+
+
+----------Splash Screen
+import 'package:flutter/material.dart';
+import 'package:flutter_05/Presentation/home_screen.dart';
+
+class ScreenSplash extends StatefulWidget {
+  const ScreenSplash({super.key});
+
+  @override
+  State<ScreenSplash> createState() => _ScreenSplashState();
+}
+
+class _ScreenSplashState extends State<ScreenSplash> {
+  @override
+  void initState() {
+    waitsplash();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [CircularProgressIndicator()],
+        ),
+      ),
+    );
+  }
+
+  waitsplash() async {
+    await Future.delayed(Duration(seconds: 3));
+    Navigator.of(
+      // ignore: use_build_context_synchronously
+      context,
+    ).push(MaterialPageRoute(builder: (context) => ScreenHome()));
+  }
+}
+
+
+
+
+
+-----List View
+body: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 10, right: 10, bottom: 20),
+            child: SizedBox(
+              height: 60,
+              child: TextFormField(
+                decoration: InputDecoration(
+                  hintText: "Ask Meta AI or Search",
+                  hintStyle: TextStyle(color: Colors.grey, fontSize: 16),
+                  prefixIcon: Icon(Icons.search, color: Colors.grey),
+                  filled: true,
+                  fillColor: const Color.fromARGB(255, 41, 40, 40),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(50),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          ListTile(
+            leading: CircleAvatar(
+              backgroundImage: AssetImage("assets/profile.jpeg"),
+              radius: 40,
+            ),
+            title: Text(
+              "James",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+                fontSize: 20,
+              ),
+            ),
+            subtitle: Text(
+              "For exclusive pictures of jiljo, call...",
+              style: TextStyle(color: Colors.white),
+            ),
+            trailing: Column(
+              children: [
+                Text(
+                  "1:09 pm",
+                  style: TextStyle(
+                    color: const Color.fromARGB(255, 66, 196, 77),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(height: 10),
+                Container(
+                  alignment: Alignment.center,
+                  height: 20,
+                  width: 20,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 66, 196, 77),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    "1",
+                    style: TextStyle(
+                      color: const Color.fromARGB(255, 29, 28, 28),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+
+
+--Future void
+Future<void> fetchdata() async {
+  await Future.delayed(Duration(seconds: 3));
+  print('Hello after delay');
+}
+
+
+--List Tile
+ListTile(
+            leading: CircleAvatar(
+              backgroundImage: AssetImage("assets/profile.jpeg"),
+              radius: 40,
+            ),
+            title: Text(
+              "James",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+                fontSize: 20,
+              ),
+            ),
+            subtitle: Text(
+              "Come to my nursery.."
+            trailing: Column(,
+              style: TextStyle(color: Colors.white),
+            ),
+              children: [
+                Text(
+                  "1:09 pm",
+                  style: TextStyle(
+                    color: const Color.fromARGB(255, 66, 196, 77),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(height: 10),
+                Container(
+                  alignment: Alignment.center,
+                  height: 20,
+                  width: 20,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 66, 196, 77),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    "1",
+                    style: TextStyle(
+                      color: const Color.fromARGB(255, 29, 28, 28),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+--floating action button
+FloatingActionButton(
+            onPressed: () {
+              setState(() {
+                //To update widgets in stateful widget.
+                counter -= 1;
+              });
+            },
+            child: Icon(Icons.minimize),
+          ),
+
+--drop down
+DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  labelText: 'Select a Department',
+                  // border: OutlineInputBorder(),
+                  // contentPadding: EdgeInsets.symmetric(
+                  //   horizontal: 12,
+                  //   vertical: 16,
+                  // ),
+                ),
+                value: null,
+                items: [
+                  DropdownMenuItem(value: 'None', child: Text('None')),
+                  DropdownMenuItem(value: 'HR', child: Text('HR')),
+                  DropdownMenuItem(value: 'IT', child: Text('IT')),
+                  DropdownMenuItem(value: 'Finance', child: Text('Finance')),
+                ],
+                onChanged: (_) {}, // no state change, just for show
+              )
+
+--another drop down
+  List<String> employeeDepartment = [   //to be declared under class
+    "None",
+    "IT",
+    "HR",
+    "Finance",
+    "Management",
+  ];
+  String? selectedDepartment;   
+
+DropdownButtonFormField(           //to be declared under widget body
+                  items: employeeDepartment.map((department) {
+                    return DropdownMenuItem(
+                      value: department,
+                      child: Text(department),
+                    );
+                  }).toList(),
+                  onChanged: (newDept) {
+                    selectedDepartment = newDept!;
+                  },
+                  hint: Text("Select Department"),
+                  value: selectedDepartment,
+                )
