@@ -1,257 +1,282 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_09_money_transacrion/Presentation/model.dart';
 
 class ScreenHome extends StatelessWidget {
-  final _formkey = GlobalKey<FormState>();
-  final ValueNotifier<List<moneyModel>> myListNotifier =
-      ValueNotifier<List<moneyModel>>([
-        moneyModel(
-          id: '1',
-          transactionNarration: 'Grocery',
-          transactionType: '-1',
-          transactionAmount: '2000',
-        ),
-        moneyModel(
-          id: '2',
-          transactionNarration: 'Salary',
-          transactionType: '+1',
-          transactionAmount: '50000',
-        ),
-        // Add other initial items here...
-      ]);
+  final _formKey = GlobalKey<FormState>();
+  final ValueNotifier<List<moneyModel>> myListNotifier = ValueNotifier([
+    moneyModel(
+      id: '1',
+      transactionNarration: 'Grocery',
+      transactionType: '-1',
+      transactionAmount: '2000',
+    ),
+    moneyModel(
+      id: '2',
+      transactionNarration: 'Salary',
+      transactionType: '+1',
+      transactionAmount: '50000',
+    ),
+  ]);
 
   ScreenHome({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.arrow_back),
-          color: const Color.fromARGB(255, 234, 255, 0),
-        ),
-        backgroundColor: const Color.fromARGB(255, 2, 131, 19),
-        title: const Text(
-          "Money Tracker",
-          style: TextStyle(
-            color: Color.fromARGB(255, 251, 255, 0),
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+      appBar: _buildAppBar(),
       body: ValueListenableBuilder<List<moneyModel>>(
         valueListenable: myListNotifier,
-        builder: (context, myList, _) {
-          return ListView.separated(
-            itemBuilder: (context, index) {
-              return ListTile(
-                leading: Container(
-                  alignment: Alignment.center,
-                  height: 30,
-                  width: 30,
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 2, 131, 19),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Text(
-                    (index + 1).toString(),
-                    style: const TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                ),
-                title: Row(
-                  children: [
-                    Text(
-                      myList[index].transactionNarration,
-                      style: const TextStyle(fontSize: 25),
-                    ),
-                    Spacer(),
-                    IconButton(
-                      onPressed: () {
-                        // Edit logic here (if any)
-                      },
-                      icon: const Icon(
-                        Icons.edit,
-                        color: Color.fromARGB(255, 0, 0, 0),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text(
-                                "Are you sure about this?",
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text(
-                                    "No",
-                                    style: TextStyle(
-                                      color: Colors.blue,
-                                      fontSize: 20,
-                                    ),
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    myListNotifier.value = List.from(myList)
-                                      ..removeAt(
-                                        index,
-                                      ); // Notify listeners about the change
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text(
-                                    "Yes",
-                                    style: TextStyle(
-                                      color: Colors.blue,
-                                      fontSize: 20,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      icon: const Icon(
-                        Icons.delete,
-                        color: Color.fromARGB(255, 255, 17, 0),
-                      ),
-                    ),
-                  ],
-                ),
-                subtitle: Text(
-                  "Amount: ₹${myList[index].transactionAmount}",
-                  style: const TextStyle(fontSize: 15),
-                ),
-              );
-            },
-            separatorBuilder: (context, index) => const Divider(),
-            itemCount: myList.length,
-          );
-        },
+        builder: (context, myList, _) => ListView.separated(
+          itemCount: myList.length,
+          separatorBuilder: (_, __) => const Divider(),
+          itemBuilder: (context, index) =>
+              _buildListTile(context, index, myList[index]),
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              String? selectedType;
-              final narrationController = TextEditingController();
-              final amountController = TextEditingController();
+      floatingActionButton: _buildFAB(context),
+    );
+  }
 
-              return AlertDialog(
-                title: const Text(
-                  "Add Transaction",
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                content: Form(
-                  key: _formkey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextFormField(
-                        controller: narrationController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          hintText: "Narration",
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter narration';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      TextFormField(
-                        controller: amountController,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          hintText: "Amount",
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter amount';
-                          }
-                          return null;
-                        },
-                      ),
-                      DropdownButtonFormField<String>(
-                        value: selectedType,
-                        items: const [
-                          DropdownMenuItem(value: '+1', child: Text('Income')),
-                          DropdownMenuItem(value: '-1', child: Text('Expense')),
-                        ],
-                        onChanged: (value) {
-                          selectedType = value;
-                        },
-                        decoration: const InputDecoration(
-                          labelText: "Transaction Type",
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please select a transaction type';
-                          }
-                          return null;
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text("Cancel"),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      if (_formkey.currentState!.validate()) {
-                        myListNotifier.value.add(
-                          moneyModel(
-                            id: DateTime.now().toString(),
-                            transactionNarration: narrationController.text,
-                            transactionAmount: amountController.text,
-                            transactionType: selectedType!,
-                          ),
-                        );
-                        myListNotifier
-                            .notifyListeners(); // Notify listeners about the new item
-                        Navigator.of(context).pop();
-                      }
-                    },
-                    child: const Text("Add"),
-                  ),
-                ],
-              );
-            },
-          );
-        },
-        backgroundColor: Colors.blue,
-        child: const Icon(Icons.add, color: Colors.white),
+  AppBar _buildAppBar() => AppBar(
+    leading: IconButton(
+      onPressed: SystemNavigator.pop,
+      icon: const Icon(
+        Icons.arrow_back,
+        color: Color.fromARGB(255, 234, 255, 0),
+      ),
+    ),
+    backgroundColor: const Color.fromARGB(255, 2, 131, 19),
+    title: const Text(
+      "Money Tracker",
+      style: TextStyle(
+        color: Color.fromARGB(255, 251, 255, 0),
+        fontSize: 28,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+  );
+
+  Widget _buildListTile(BuildContext context, int index, moneyModel model) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundColor: const Color.fromARGB(255, 2, 131, 19),
+        child: Text(
+          '${index + 1}',
+          style: const TextStyle(color: Colors.white, fontSize: 20),
+        ),
+      ),
+      title: Row(
+        children: [
+          Expanded(
+            child: Text(
+              model.transactionNarration,
+              style: const TextStyle(fontSize: 25),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.edit, color: Colors.black),
+            onPressed: () => _editTransaction(context, index),
+          ),
+          IconButton(
+            icon: const Icon(
+              Icons.delete,
+              color: Color.fromARGB(255, 255, 17, 0),
+            ),
+            onPressed: () => _showDeleteDialog(context, index),
+          ),
+        ],
+      ),
+      subtitle: Text(
+        "Amount: ₹${model.transactionAmount}",
+        style: TextStyle(
+          fontSize: 15,
+          color: model.transactionType == '-1' ? Colors.red : Colors.green,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
+
+  Widget _buildFAB(BuildContext context) => FloatingActionButton(
+    backgroundColor: Colors.blue,
+    child: const Icon(Icons.add, color: Colors.white),
+    onPressed: () => _showAddTransactionDialog(context),
+  );
+
+  void _showDeleteDialog(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text(
+          "Are you sure about this?",
+          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              "No",
+              style: TextStyle(color: Colors.blue, fontSize: 20),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              myListNotifier.value = List.from(myListNotifier.value)
+                ..removeAt(index);
+              Navigator.pop(context);
+            },
+            child: const Text(
+              "Yes",
+              style: TextStyle(color: Colors.blue, fontSize: 20),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddTransactionDialog(BuildContext context) {
+    final narrationController = TextEditingController();
+    final amountController = TextEditingController();
+    String? selectedType;
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text(
+          "Add Transaction",
+          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+        ),
+        content: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildTextField(narrationController, "Narration"),
+              const SizedBox(height: 10),
+              _buildTextField(amountController, "Amount", isNumber: true),
+              DropdownButtonFormField<String>(
+                value: selectedType,
+                items: const [
+                  DropdownMenuItem(value: '+1', child: Text('Income')),
+                  DropdownMenuItem(value: '-1', child: Text('Expense')),
+                ],
+                onChanged: (value) => selectedType = value,
+                decoration: const InputDecoration(
+                  labelText: "Transaction Type",
+                ),
+                validator: (value) =>
+                    value == null ? 'Please select a transaction type' : null,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                myListNotifier.value.add(
+                  moneyModel(
+                    id: DateTime.now().toString(),
+                    transactionNarration: narrationController.text,
+                    transactionAmount: amountController.text,
+                    transactionType: selectedType!,
+                  ),
+                );
+                myListNotifier.notifyListeners();
+                Navigator.pop(context);
+              }
+            },
+            child: const Text("Add"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _editTransaction(BuildContext context, int index) {
+    final narrationController = TextEditingController(
+      text: myListNotifier.value[index].transactionNarration,
+    );
+    final amountController = TextEditingController(
+      text: myListNotifier.value[index].transactionAmount,
+    );
+    String selectedType = myListNotifier.value[index].transactionType;
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text(
+          "Edit Transaction",
+          style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: narrationController,
+              decoration: const InputDecoration(labelText: "Narration"),
+            ),
+            TextField(
+              controller: amountController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: "Amount"),
+            ),
+            DropdownButtonFormField<String>(
+              value: selectedType,
+              items: const [
+                DropdownMenuItem(value: '+1', child: Text('Income')),
+                DropdownMenuItem(value: '-1', child: Text('Expense')),
+              ],
+              onChanged: (value) => selectedType = value!,
+              decoration: const InputDecoration(labelText: "Transaction Type"),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () {
+              final updated = moneyModel(
+                id: myListNotifier.value[index].id,
+                transactionNarration: narrationController.text,
+                transactionAmount: amountController.text,
+                transactionType: selectedType,
+              );
+              final list = List<moneyModel>.from(myListNotifier.value);
+              list[index] = updated;
+              myListNotifier.value = list;
+              Navigator.pop(context);
+            },
+            child: const Text("Save"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextField(
+    TextEditingController controller,
+    String hint, {
+    bool isNumber = false,
+  }) => TextFormField(
+    controller: controller,
+    keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+    decoration: InputDecoration(
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+      hintText: hint,
+    ),
+    validator: (value) =>
+        (value == null || value.isEmpty) ? 'Please enter $hint' : null,
+  );
 }
