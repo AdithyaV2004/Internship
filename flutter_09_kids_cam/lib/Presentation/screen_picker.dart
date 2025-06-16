@@ -32,6 +32,7 @@ class ScreenPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 9, 134, 0),
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
@@ -39,8 +40,12 @@ class ScreenPicker extends StatelessWidget {
           },
           icon: Icon(Icons.arrow_back),
         ),
-        title: const Text('Choose Image'),
+        title: const Text(
+          'Choose Image',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
         centerTitle: true,
+        backgroundColor: Colors.blue,
       ),
       body: Column(
         children: [
@@ -63,7 +68,7 @@ class ScreenPicker extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.all(35.0),
             child: ElevatedButton.icon(
               onPressed: () => _pickFromGallery(context),
               icon: const Icon(Icons.photo_library),
