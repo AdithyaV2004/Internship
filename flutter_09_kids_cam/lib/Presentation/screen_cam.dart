@@ -1,6 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'dart:io';
 
 class ScreenCam extends StatefulWidget {
   const ScreenCam({super.key});
@@ -14,6 +14,9 @@ class _ScreenCamState extends State<ScreenCam> {
   CameraController? cameraController;
   double _opacity = 0.5;
 
+  late String imagePath;
+  late bool isAsset;
+
   @override
   void initState() {
     super.initState();
@@ -21,97 +24,78 @@ class _ScreenCamState extends State<ScreenCam> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: BackButton(
-          style: ButtonStyle(iconSize: WidgetStatePropertyAll(30)),
-          onPressed: () {
-            SystemNavigator.pop(); // Exits the app
-          },
-          color: const Color.fromARGB(255, 0, 0, 0),
-        ),
-        title: Text(
-          "KidsCam",
-          style: TextStyle(
-            fontSize: 30,
-            color: const Color.fromARGB(255, 0, 0, 0),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-      ),
-
-      body: _buildUI(),
-    );
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+    imagePath = args['path'];
+    isAsset = args['isAsset'];
   }
 
-  Widget _buildUI() {
-    if (cameraController == null || !cameraController!.value.isInitialized) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    return SafeArea(
-      child: SizedBox.expand(
-        child: Stack(
-          children: [
-            // Camera preview
-            SizedBox(
-              height: MediaQuery.sizeOf(context).height,
-              child: CameraPreview(cameraController!),
-            ),
-
-            // Foreground image with opacity
-            Opacity(
-              opacity: _opacity,
-              child: Center(
-                child: Image.asset(
-                  "assets/draw.jpg",
-                  fit: BoxFit.contain,
-                  width: double.infinity,
-                  height: double.infinity,
-                ),
-              ),
-            ),
-
-            // Slider at the bottom
-            Positioned(
-              bottom: 30,
-              left: 20,
-              right: 20,
-              child: Slider(
-                value: _opacity,
-                min: 0.0,
-                max: 1.0,
-                divisions: 100,
-                label: _opacity.toStringAsFixed(2),
-                onChanged: (value) {
-                  setState(() {
-                    _opacity = value;
-                  });
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  @override
+  void dispose() {
+    cameraController?.dispose();
+    super.dispose();
   }
 
   Future<void> _setupCameraController() async {
-    // ignore: no_leading_underscores_for_local_identifiers
-    List<CameraDescription> _cameras = await availableCameras();
+    final List<CameraDescription> _cameras = await availableCameras();
     if (_cameras.isNotEmpty) {
-      setState(() {
-        cameras = _cameras;
-        cameraController = CameraController(
-          _cameras.first,
-          ResolutionPreset.high,
-        );
-      });
-      cameraController?.initialize().then((_) {
-        setState(() {});
-      });
+      cameraController = CameraController(
+        _cameras.first,
+        ResolutionPreset.medium,
+        enableAudio: false,
+      );
+      await cameraController!.initialize();
+      if (mounted) setState(() {});
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Overlay Camera"), centerTitle: true),
+      body: cameraController == null || !cameraController!.value.isInitialized
+          ? const Center(child: CircularProgressIndicator())
+          : Stack(
+              children: [
+                Center(child: CameraPreview(cameraController!)),
+                Opacity(
+                  opacity: _opacity,
+                  child: isAsset
+                      ? Image.asset(
+                          imagePath,
+                          width: double.infinity,
+                          height: double.infinity,
+                          fit: BoxFit.contain,
+                        )
+                      : Image.file(
+                          File(imagePath),
+                          width: double.infinity,
+                          height: double.infinity,
+                          fit: BoxFit.contain,
+                        ),
+                ),
+                Positioned(
+                  bottom: 20,
+                  left: 20,
+                  right: 20,
+                  child: Column(
+                    children: [
+                      Slider(
+                        value: _opacity,
+                        min: 0.0,
+                        max: 1.0,
+                        onChanged: (val) {
+                          setState(() => _opacity = val);
+                        },
+                      ),
+                      const Text("Adjust Image Opacity"),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+    );
   }
 }
