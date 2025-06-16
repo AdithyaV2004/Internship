@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class ScreenCam extends StatefulWidget {
   const ScreenCam({super.key});
@@ -25,6 +26,7 @@ class _ScreenCamState extends State<ScreenCam> {
   @override
   void initState() {
     super.initState();
+    WakelockPlus.enable();
     _setupCameraController();
   }
 
@@ -51,6 +53,7 @@ class _ScreenCamState extends State<ScreenCam> {
 
   @override
   void dispose() {
+    WakelockPlus.disable();
     cameraController?.dispose();
     super.dispose();
   }
