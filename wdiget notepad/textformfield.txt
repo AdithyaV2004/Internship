@@ -261,3 +261,39 @@ DropdownButtonFormField(           //to be declared under widget body
                   hint: Text("Select Department"),
                   value: selectedDepartment,
                 )
+
+--validator
+validator: (value) {   //in widget function
+                      if (value == null || value.isEmpty) {
+                        return "Employee name is required";
+                      }
+                      return null;
+                    },
+
+if (_formKey.currentState!.validate()) {  --in validating widget
+                        double bs = double.parse(salaryController.text);
+                      }
+
+--transparent appbar
+extendBodyBehindAppBar: true,     //in scaffold
+      appBar: AppBar(
+        leading: BackButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ScreenSplash()),
+            );
+          },
+          color: Colors.white,
+        ),
+        title: Text(
+          "KidsCam",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+
+--height using mediaquery
+height: MediaQuery.of(context).size.height * 0.2
