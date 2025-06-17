@@ -18,6 +18,7 @@ class _ScreenCamState extends State<ScreenCam> {
   List<CameraDescription> cameras = [];
   CameraController? cameraController;
   double _opacity = 0.5;
+  double _scale = 1.0;
 
   late String imagePath;
   late bool isAsset;
@@ -123,21 +124,24 @@ class _ScreenCamState extends State<ScreenCam> {
 
                 // Overlay Image
                 if (!isProcessing)
-                  Opacity(
-                    opacity: _opacity,
-                    child: isAsset
-                        ? Image.asset(
-                            imagePath,
-                            width: double.infinity,
-                            height: double.infinity,
-                            fit: BoxFit.contain,
-                          )
-                        : Image.file(
-                            File(imagePath),
-                            width: double.infinity,
-                            height: double.infinity,
-                            fit: BoxFit.contain,
-                          ),
+                  Transform.scale(
+                    scale: _scale,
+                    child: Opacity(
+                      opacity: _opacity,
+                      child: isAsset
+                          ? Image.asset(
+                              imagePath,
+                              width: double.infinity,
+                              height: double.infinity,
+                              fit: BoxFit.contain,
+                            )
+                          : Image.file(
+                              File(imagePath),
+                              width: double.infinity,
+                              height: double.infinity,
+                              fit: BoxFit.contain,
+                            ),
+                    ),
                   ),
 
                 if (isProcessing)
@@ -159,7 +163,31 @@ class _ScreenCamState extends State<ScreenCam> {
                             setState(() => _opacity = val);
                           },
                         ),
-                        const Text("Adjust Image Opacity"),
+                        const Text(
+                          "Adjust Image Opacity",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        Slider(
+                          value: _scale,
+                          min: 0.2,
+                          max: 3.0,
+                          divisions: 14,
+                          label: "Size: ${_scale.toStringAsFixed(1)}x",
+                          onChanged: (val) {
+                            setState(() => _scale = val);
+                          },
+                        ),
+                        const Text(
+                          "Adjust Image Size",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                   ),
