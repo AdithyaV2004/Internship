@@ -1,3 +1,5 @@
+import 'package:firebase_app/Infrastructure/db_functions.dart';
+import 'package:firebase_app/Model/user_model.dart';
 import 'package:flutter/material.dart';
 
 class ScreenRegistration extends StatelessWidget {
@@ -42,6 +44,7 @@ class ScreenRegistration extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(18.0),
               child: TextFormField(
+                keyboardType: TextInputType.emailAddress,
                 controller: userEmailController,
                 validator: (value) {
                   if (value!.isEmpty) {
@@ -108,13 +111,9 @@ class ScreenRegistration extends StatelessWidget {
                   }
                   return null;
                 },
-                items:
-                    userGender.map((gender) {
-                      return DropdownMenuItem(
-                        value: gender,
-                        child: Text(gender),
-                      );
-                    }).toList(),
+                items: userGender.map((gender) {
+                  return DropdownMenuItem(value: gender, child: Text(gender));
+                }).toList(),
                 hint: Text('Gender'),
 
                 value: selectedGender,
@@ -145,8 +144,29 @@ class ScreenRegistration extends StatelessWidget {
             ),
             Center(
               child: ElevatedButton(
-                onPressed: () {
-                  if (_regFormKey.currentState!.validate()) {}
+                onPressed: () async {
+                  if (_regFormKey.currentState!.validate()) {
+                    UserModel u = UserModel(
+                      "",
+                      userNameController.text,
+                      userEmailController.text,
+                      selectedGender!,
+                      userAddressController.text,
+                      userPasswordController.text,
+                    );
+
+                    bool result = await addUser(u);
+                    final snackBar = SnackBar(
+                      content: Text(result == true ? 'Success' : 'Error'),
+                      action: SnackBarAction(
+                        label: 'ok',
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  }
                 },
                 child: Text('Regsiter'),
               ),

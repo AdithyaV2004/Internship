@@ -1,3 +1,5 @@
+import 'package:firebase_app/Infrastructure/db_functions.dart';
+import 'package:firebase_app/Model/user_model.dart';
 import 'package:firebase_app/Presentation/home_screen.dart';
 import 'package:firebase_app/Presentation/registration_screen.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +38,7 @@ class ScreenLogin extends StatelessWidget {
                   SizedBox(height: 10),
                   TextFormField(
                     controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
                     validator: (value) {
                       if (value!.isEmpty) {
                         return 'Email required';
@@ -71,13 +74,40 @@ class ScreenLogin extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => ScreenUserHome(),
-                            ),
-                          );
-                          // if (_loginAFormKey.currentState!.validate()) {}
+                        onPressed: () async {
+                          if (_loginAFormKey.currentState!.validate()) {
+                            UserModel u = UserModel(
+                              "",
+                              "",
+                              emailController.text,
+                              "userGender",
+                              "",
+                              passwordController.text,
+                            );
+                            bool result = await checkLogin(u);
+                            debugPrint((result).toString());
+                            if (result) {
+                              UserModel u = await loadUser('');
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => ScreenUserHome(u: u),
+                                ),
+                              );
+                            } else {
+                              final snackBar = SnackBar(
+                                content: Text('Cannot Login'),
+                                // action: SnackBarAction(
+                                //   label: 'ok',
+                                //   onPressed: () {
+                                //     Navigator.pop(context);
+                                //   },
+                                // ),
+                              );
+                              ScaffoldMessenger.of(
+                                context,
+                              ).showSnackBar(snackBar);
+                            }
+                          }
                         },
                         child: Text('Login'),
                       ),
@@ -88,7 +118,7 @@ class ScreenLogin extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Donot have an account?',
+                        'Do not have an account?',
                         style: TextStyle(color: Colors.indigo),
                       ),
                       IconButton(

@@ -1,8 +1,19 @@
+import 'package:firebase_app/Core/core.dart';
+import 'package:firebase_app/Infrastructure/db_functions.dart';
+import 'package:firebase_app/Model/user_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_user_management_2/Core/core.dart';
 
 class ScreenUserHome extends StatelessWidget {
-  ScreenUserHome({super.key});
+  bool editKey = false;
+  UserModel u;
+  ScreenUserHome({super.key, required this.u}) {
+    appBarTitle = u.userName;
+    userNameController.text = u.userName;
+    userEmailController.text = u.userEmail;
+    selectedGender = u.userGender;
+    userAddressController.text = u.userAddress;
+  }
+  String appBarTitle = '';
   final userNameController = TextEditingController();
   final userEmailController = TextEditingController();
   final userPasswordController = TextEditingController();
@@ -16,11 +27,15 @@ class ScreenUserHome extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.indigo,
-        title: Text('Welcome<Name>', style: TextStyle(color: Colors.white)),
+        title: Text(
+          'Welcome $appBarTitle',
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
           IconButton(
             onPressed: () {
-              isEditableNotifier.value = true;
+              editKey = !editKey;
+              isEditableNotifier.value = editKey;
             },
             icon: Icon(Icons.edit, color: Colors.white),
           ),
@@ -61,7 +76,7 @@ class ScreenUserHome extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(18.0),
                   child: TextFormField(
-                    enabled: newIsEditable,
+                    enabled: false,
                     controller: userEmailController,
                     validator: (value) {
                       if (value!.isEmpty) {
@@ -87,22 +102,20 @@ class ScreenUserHome extends StatelessWidget {
                       }
                       return null;
                     },
-                    items:
-                        userGender.map((gender) {
-                          return DropdownMenuItem(
-                            value: gender,
-                            child: Text(gender),
-                          );
-                        }).toList(),
+                    items: userGender.map((gender) {
+                      return DropdownMenuItem(
+                        value: gender,
+                        child: Text(gender),
+                      );
+                    }).toList(),
                     hint: Text('Gender'),
 
                     value: selectedGender,
-                    onChanged:
-                        newIsEditable == true
-                            ? (newGender) {
-                              selectedGender = newGender as String?;
-                            }
-                            : null,
+                    onChanged: newIsEditable == true
+                        ? (newGender) {
+                            selectedGender = newGender as String?;
+                          }
+                        : null,
                   ),
                 ),
                 Padding(
@@ -129,12 +142,36 @@ class ScreenUserHome extends StatelessWidget {
                 ),
                 Center(
                   child: ElevatedButton(
-                    onPressed:
-                        newIsEditable == true
-                            ? () {
-                              if (_regFormKey.currentState!.validate()) {}
+                    onPressed: newIsEditable == true
+                        ? () async {
+                            if (_regFormKey.currentState!.validate()) {
+                              UserModel u = UserModel(
+                                "id",
+                                userNameController.text,
+                                userEmailController.text,
+                                selectedGender!,
+                                userAddressController.text,
+                                "",
+                              );
+                              bool result = await editUser(u);
+                              if (result) {
+                                final snackBar = SnackBar(
+                                  content: Text("Data Changed"),
+                                );
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).showSnackBar(snackBar);
+                              } else {
+                                final snackBar = SnackBar(
+                                  content: Text("Couldn't update data"),
+                                );
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).showSnackBar(snackBar);
+                              }
                             }
-                            : null,
+                          }
+                        : null,
                     child: Text('Save Changes'),
                   ),
                 ),
